@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>لعبة الكرة المتحركة</title>
+    
+    <!-- إضافة وصف وأيقونة للتطبيق -->
+    <meta name="description" content="لعبة الكرة المتحركة - تحدي الدقة والسرعة">
+    <link rel="icon" type="image/png" href="images/bals.png">
+    
+    <!-- إضافة خاصية PWA للتطبيق -->
+    <meta name="theme-color" content="#4CAF50">
+    <link rel="apple-touch-icon" href="images/bals.png">
+    <!-- إضافة Web App Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Meta tags for iOS -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="لعبة الكرة المتحركة">
+    <style>
+        /* أضف هذا النمط لمنع التأثيرات غير المرغوب فيها */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            background-color: black;
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            position: fixed;
+            top: 0;
+            left: 0;
+            padding: 10px;
+        }
+        
+        /* شاشة البداية */
+        #start-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center;
+            z-index: 1000;
+            padding: 20px;
+            text-align: center;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        /* رأس التطبيق مع الصورة */
+        .app-header {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .app-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 20px;
+            margin-bottom: 15px;
+            border: 3px solid #4CAF50;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+            object-fit: cover;
+        }
+        
+        #start-screen h1 {
+            font-size: 2rem;
+            margin-bottom: 15px;
+            color: #4CAF50;
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
+        }
+        
+        #instructions-container {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 15px 0;
+            max-width: 95%;
+            backdrop-filter: blur(10px);
+        }
+        
+        #instructions-container h2 {
+            color: #00aaff;
+            margin-bottom: 12px;
+            font-size: 1.3rem;
+        }
+        
+        #instructions-container ul {
+            text-align: right;
+            list-style-type: none;
+            padding: 0;
+        }
+        
+        #instructions-container li {
+            margin-bottom: 8px;
+            padding: 6px;
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        
+        .start-button {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            border: none;
+            color: white;
+            padding: 12px 30px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 1.1rem;
+            margin: 15px 0;
+            cursor: pointer;
+            border-radius: 50px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
+            min-height: 44px;
+        }
+        
+        .start-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.6);
+        }
+        
+        /* عناصر التحكم خارج الحاوية */
+        #game-controls {
+            width: 100%;
+            max-width: 500px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: white;
+            z-index: 20;
+        }
+        
+        /* التعديل: عرض المؤشرات بشكل أفقي */
+        .indicators-container {
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        #timer-container, #coverage-indicator {
+            flex: 1;
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.5);
+            padding: 8px;
+            border-radius: 8px;
+            border: 1px solid #4CAF50;
+            min-width: 0; /* يمنع التمدد الزائد */
+        }
+        
+        #timer-bar, #coverage-bar {
+            width: 85%;
+            height: 6px;
+            background-color: #333;
+            margin: 5px auto;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        #timer-progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #ff0000, #ff9900);
+            transition: width 0.5s;
+        }
+        
+        #coverage-progress {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(to right, #ff9900, #4CAF50);
+            transition: width 0.3s;
+        }
+        
+        /* شاشة اللعبة */
+        #game-container {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            max-width: 500px;
+            max-height: 70vh;
+            background-color: black;
+            display: none;
+            border: 3px solid #4CAF50;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
+            overflow: hidden;
+        }
+        
+        #circle {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: transparent;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.1s;
+            z-index: 10;
+            touch-action: none;
+            /* إزالة الظل الأحمر */
+            box-shadow: none;
+            /* إضافة صورة كرة القدم */
+            background-image: url('images/foot_ball.png');
+            background-size: cover;
+            background-position: center;
+            /* إضافة دوران للكرة */
+            transform-style: preserve-3d;
+        }
+        
+        @media (max-width: 480px) {
+            #circle, #target {
+                width: 50px;
+                height: 50px;
+            }
+            
+            .app-icon {
+                width: 80px;
+                height: 80px;
+            }
+            
+            /* التعديل: تحسين التخطيط الأفقي للشاشات الصغيرة */
+            .indicators-container {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            #timer-container, #coverage-indicator {
+                width: 100%;
+            }
+        }
+        
+        #target {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            background-color: #00aaff;
+            border-radius: 50%;
+            box-shadow: 0 0 15px rgba(0, 170, 255, 0.7);
+            z-index: 5;
+        }
+        
+        #overlay {
+            position: absolute;
+            width: 54px;
+            height: 54px;
+            background-color: rgba(255, 255, 0, 0.3);
+            border-radius: 50%;
+            border: 1px dashed yellow;
+            z-index: 7;
+            pointer-events: none;
+            display: none;
+        }
+        
+        @media (max-width: 480px) {
+            #overlay {
+                width: 45px;
+                height: 45px;
+            }
+        }
+        
+        #score {
+            position: absolute;
+            bottom: 15px;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-size: 20px;
+            z-index: 20;
+        }
+        
+        #goal-message {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: rgba(0, 0, 0, 0.95);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            z-index: 200;
+            display: none;
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
+            border: 3px solid #4CAF50;
+            width: 90%;
+            max-width: 350px;
+            backdrop-filter: blur(10px);
+        }
+        
+        #goal-message h2 {
+            margin-bottom: 15px;
+            color: #4CAF50;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px rgba(76, 175, 80, 0.7);
+        }
+        
+        #goal-message p {
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+        }
+        
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 12px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 8px 10px;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s;
+            min-height: 44px;
+            min-width: 100px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+        
+        .button:hover {
+            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+        
+        .button.exit {
+            background-color: #f44336;
+        }
+        
+        .button.exit:hover {
+            background-color: #d32f2f;
+        }
+        
+        .pulse {
+            animation: pulse 0.5s;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+        
+        .target-pulse {
+            animation: targetPulse 1s infinite;
+        }
+        
+        @keyframes targetPulse {
+            0% { box-shadow: 0 0 15px rgba(0, 170, 255, 0.7); }
+            50% { box-shadow: 0 0 25px rgba(0, 170, 255, 1); }
+            100% { box-shadow: 0 0 15px rgba(0, 170, 255, 0.7); }
+        }
+        
+        .goal-effect {
+            animation: goalEffect 1s;
+        }
+        
+        @keyframes goalEffect {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.5); opacity: 0.7; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        
+        .coverage-good {
+            box-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
+        }
+        
+        /* الألعاب النارية - تغطي كامل الصفحة */
+        .firework {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 100;
+            animation: firework 1.5s ease-out forwards;
+        }
+        
+        @keyframes firework {
+            0% { 
+                transform: translate(var(--start-x), var(--start-y));
+                width: 6px;
+                height: 6px;
+                opacity: 1;
+            }
+            50% {
+                width: 4px;
+                height: 4px;
+                opacity: 1;
+            }
+            100% { 
+                transform: translate(var(--end-x), var(--end-y));
+                width: 0px;
+                height: 0px;
+                opacity: 0;
+            }
+        }
+        
+        /* تأثير خلفية الألعاب النارية */
+        .fireworks-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.7) 100%);
+            pointer-events: none;
+            z-index: 99;
+            animation: overlayFade 3s ease-in-out;
+        }
+        
+        @keyframes overlayFade {
+            0% { opacity: 0; }
+            20% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        /* رسالة خطأ في حالة عدم وجود الصورة */
+        .image-error {
+            display: none;
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border: 1px solid #ff6b6b;
+        }
+        
+        /* تأثير دوران الكرة */
+        .ball-rotation {
+            animation: ballRotation 0.5s linear infinite;
+        }
+        
+        @keyframes ballRotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* تأثير دوران الكرة حسب الاتجاه */
+        .ball-rotation-x {
+            animation: ballRotationX 0.5s linear infinite;
+        }
+        
+        @keyframes ballRotationX {
+            0% { transform: rotateX(0deg); }
+            100% { transform: rotateX(360deg); }
+        }
+        
+        .ball-rotation-y {
+            animation: ballRotationY 0.5s linear infinite;
+        }
+        
+        @keyframes ballRotationY {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- شاشة البداية -->
+    <div id="start-screen">
+        <div class="app-header">
+            <h1>لعبة الكرة المتحركة</h1>
+        </div>
+        
+        <button id="start-button" class="start-button">بدء اللعبة</button>
+        <div id="instructions-container">
+            <h2>طريقة اللعب</h2>
+            <ul>
+                <li>⚽ المس كرة القدم لتحريكها في نفس اتجاه المس</li>
+                <li>🎯 حاول تغطية 1% من الدائرة الزرقاء عند توقف الكرة</li>
+                <li>⏱️ تتحرك الكرة بسرعة في البداية ثم تتباطأ تدريجياً</li>
+                <li>🎆 عند تحقيق الهدف، ستظهر ألعاب نارية كاملة الشاشة لمدة 3 ثوانٍ</li>
+                <li>🔄 يمكنك إيقاف الكرة المتحركة بلمسها مرة أخرى</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- عناصر التحكم خارج الحاوية -->
+    <div id="game-controls" style="display: none;">
+        <!-- التعديل: حاوية للمؤشرات بشكل أفقي -->
+        <div class="indicators-container">
+            <div id="timer-container">
+                <div>مدة الحركة: <span id="timer-value">0</span> ثانية</div>
+                <div id="timer-bar">
+                    <div id="timer-progress"></div>
+                </div>
+            </div>
+            <div id="coverage-indicator">
+                <div>التغطية: <span id="coverage-value">0</span>%</div>
+                <div id="coverage-bar">
+                    <div id="coverage-progress"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- شاشة اللعبة -->
+    <div id="game-container">
+        <div id="circle"></div>
+        <div id="target"></div>
+        <div id="overlay"></div>
+        <div id="score">الأهداف: <span id="points">0</span></div>
+        
+        <div id="goal-message">
+            <h2>🎯 هدف رائع!</h2>
+            <p>لقد غطيت <span id="final-coverage">0</span>% من الهدف</p>
+            <div>
+                <button id="continue-btn" class="button">استمرار</button>
+                <button id="exit-btn" class="button exit">إنهاء اللعبة</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // منع التكبير والتصغير
+            document.addEventListener('touchstart', function(e) {
+                if (e.touches.length > 1) {
+                    e.preventDefault();
+                }
+            });
+            
+            // عناصر واجهة المستخدم
+            const startScreen = document.getElementById('start-screen');
+            const startButton = document.getElementById('start-button');
+            const gameControls = document.getElementById('game-controls');
+            const gameContainer = document.getElementById('game-container');
+            const circle = document.getElementById('circle');
+            const target = document.getElementById('target');
+            const overlay = document.getElementById('overlay');
+            const pointsDisplay = document.getElementById('points');
+            const timerValue = document.getElementById('timer-value');
+            const timerProgress = document.getElementById('timer-progress');
+            const coverageValue = document.getElementById('coverage-value');
+            const coverageProgress = document.getElementById('coverage-progress');
+            const goalMessage = document.getElementById('goal-message');
+            const finalCoverage = document.getElementById('final-coverage');
+            const continueBtn = document.getElementById('continue-btn');
+            const exitBtn = document.getElementById('exit-btn');
+            
+            // متغيرات اللعبة
+            let points = 0;
+            let isMoving = false;
+            let velocity = 0;
+            let directionX = 0;
+            let directionY = 0;
+            let friction = 0.985;
+            let maxSpeed = 12;
+            let animationId;
+            let moveStartTime = 0;
+            let moveDuration = 0;
+            let gameActive = false;
+            let currentCoverage = 0;
+            let ballRotation = 0;
+            
+            // أبعاد الكرة والحاوية
+            let circleRadius = 30;
+            let targetRadius = 30;
+            let containerWidth, containerHeight;
+            
+            // موضع الكرة الحالي
+            let circleX, circleY;
+            
+            // ضبط نصف القطر بناءً على حجم الشاشة
+            function adjustCircleSize() {
+                if (window.innerWidth <= 480) {
+                    circleRadius = 25;
+                    targetRadius = 25;
+                    circle.style.width = '50px';
+                    circle.style.height = '50px';
+                    target.style.width = '50px';
+                    target.style.height = '50px';
+                } else {
+                    circleRadius = 30;
+                    targetRadius = 30;
+                    circle.style.width = '60px';
+                    circle.style.height = '60px';
+                    target.style.width = '60px';
+                    target.style.height = '60px';
+                }
+            }
+            
+            // بدء اللعبة
+            startButton.addEventListener('click', function() {
+                startScreen.style.display = 'none';
+                gameControls.style.display = 'flex';
+                gameContainer.style.display = 'block';
+                gameActive = true;
+                initGame();
+            });
+            
+            // إنهاء اللعبة
+            exitBtn.addEventListener('click', function() {
+                alert(`🎉 لقد أنهيت اللعبة! \n\nعدد الأهداف: ${points}`);
+                location.reload();
+            });
+            
+            // تحديث أبعاد الحاوية
+            function updateContainerSize() {
+                containerWidth = gameContainer.clientWidth;
+                containerHeight = gameContainer.clientHeight;
+            }
+            
+            // وضع الهدف في مكان عشوائي
+            function placeTarget() {
+                updateContainerSize();
+                
+                // حساب الحد الأدنى والأقصى للمواضع مع مراعاة نصف القطر
+                const minX = targetRadius;
+                const maxX = containerWidth - targetRadius;
+                const minY = targetRadius;
+                const maxY = containerHeight - targetRadius;
+                
+                const randomX = minX + Math.random() * (maxX - minX);
+                const randomY = minY + Math.random() * (maxY - minY);
+                
+                target.style.left = randomX + 'px';
+                target.style.top = randomY + 'px';
+                
+                // تحديث موقع الطبقة الشفافة
+                const overlayRadius = window.innerWidth <= 480 ? 22.5 : 27;
+                overlay.style.left = (randomX + targetRadius - overlayRadius) + 'px';
+                overlay.style.top = (randomY + targetRadius - overlayRadius) + 'px';
+                
+                // إضافة تأثير النبض للهدف
+                target.classList.add('target-pulse');
+            }
+            
+            // حساب نسبة التغطية
+            function calculateCoverage() {
+                // الحصول على المواقع النسبية داخل الحاوية
+                const circleLeft = parseFloat(circle.style.left) || 0;
+                const circleTop = parseFloat(circle.style.top) || 0;
+                const targetLeft = parseFloat(target.style.left) || 0;
+                const targetTop = parseFloat(target.style.top) || 0;
+                
+                // حساب المسافة بين مركزي الدائرتين
+                const circleCenterX = circleLeft + circleRadius;
+                const circleCenterY = circleTop + circleRadius;
+                const targetCenterX = targetLeft + targetRadius;
+                const targetCenterY = targetTop + targetRadius;
+                
+                const distance = Math.sqrt(
+                    Math.pow(circleCenterX - targetCenterX, 2) + 
+                    Math.pow(circleCenterY - targetCenterY, 2)
+                );
+                
+                // إذا كانت المسافة أكبر من مجموع نصف القطرين، فلا يوجد تداخل
+                if (distance >= circleRadius + targetRadius) {
+                    return 0;
+                }
+                
+                // إذا كانت دائرة واحدة داخل الأخرى بالكامل
+                if (distance <= Math.abs(circleRadius - targetRadius)) {
+                    return 100;
+                }
+                
+                // حساب مساحة التداخل بين الدائرتين
+                const r = circleRadius;
+                const R = targetRadius;
+                const d = distance;
+                
+                const part1 = r*r * Math.acos((d*d + r*r - R*R) / (2*d*r));
+                const part2 = R*R * Math.acos((d*d + R*R - r*r) / (2*d*R));
+                const part3 = 0.5 * Math.sqrt((-d+r+R)*(d+r-R)*(d-r+R)*(d+r+R));
+                
+                const intersectionArea = part1 + part2 - part3;
+                const targetArea = Math.PI * R * R;
+                
+                // نسبة التغطية (مساحة التداخل / مساحة الهدف)
+                const coverage = (intersectionArea / targetArea) * 100;
+                
+                return Math.min(100, Math.max(0, coverage));
+            }
+            
+            // تحديث مؤشر التغطية
+            function updateCoverageIndicator() {
+                currentCoverage = calculateCoverage();
+                coverageValue.textContent = currentCoverage.toFixed(1);
+                coverageProgress.style.width = currentCoverage + '%';
+                
+                // إظهار أو إخفاء الطبقة الشفافة
+                if (currentCoverage > 0 && !isMoving) {
+                    overlay.style.display = 'block';
+                    if (currentCoverage >= 1) {
+                        target.classList.add('coverage-good');
+                    } else {
+                        target.classList.remove('coverage-good');
+                    }
+                } else {
+                    overlay.style.display = 'none';
+                    target.classList.remove('coverage-good');
+                }
+            }
+            
+            // إنشاء الألعاب النارية التي تغطي كامل الصفحة
+            function createFireworks() {
+                const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ff9900', '#ff66cc', '#66ff66'];
+                const body = document.body;
+                
+                // إنشاء طبقة خلفية للألعاب النارية
+                const overlay = document.createElement('div');
+                overlay.className = 'fireworks-overlay';
+                body.appendChild(overlay);
+                
+                // إنشاء عدد كبير من الألعاب النارية لتغطية كامل الصفحة
+                const fireworkCount = 150;
+                
+                for (let i = 0; i < fireworkCount; i++) {
+                    const firework = document.createElement('div');
+                    firework.className = 'firework';
+                    
+                    // لون عشوائي
+                    const color = colors[Math.floor(Math.random() * colors.length)];
+                    firework.style.backgroundColor = color;
+                    
+                    // موقع البداية عشوائي في كامل الصفحة
+                    const startX = Math.random() * window.innerWidth;
+                    const startY = Math.random() * window.innerHeight;
+                    
+                    // اتجاه ومسافة عشوائية
+                    const angle = Math.random() * Math.PI * 2;
+                    const distance = 50 + Math.random() * 200;
+                    const endX = startX + Math.cos(angle) * distance;
+                    const endY = startY + Math.sin(angle) * distance;
+                    
+                    // تعيين المتغيرات CSS للحركة
+                    firework.style.setProperty('--start-x', '0px');
+                    firework.style.setProperty('--start-y', '0px');
+                    firework.style.setProperty('--end-x', (endX - startX) + 'px');
+                    firework.style.setProperty('--end-y', (endY - startY) + 'px');
+                    
+                    // الموضع المطلق
+                    firework.style.left = startX + 'px';
+                    firework.style.top = startY + 'px';
+                    
+                    body.appendChild(firework);
+                    
+                    // إزالة الألعاب النارية بعد انتهاء الحركة
+                    setTimeout(() => {
+                        if (firework.parentNode) {
+                            firework.parentNode.removeChild(firework);
+                        }
+                    }, 3000);
+                }
+                
+                // إزالة طبقة الخلفية بعد 3 ثوانٍ
+                setTimeout(() => {
+                    if (overlay.parentNode) {
+                        overlay.parentNode.removeChild(overlay);
+                    }
+                }, 3000);
+            }
+            
+            // التحقق من تحقيق الهدف
+            function checkGoal() {
+                if (!gameActive || isMoving) return;
+                
+                // يتم تسجيل الهدف فقط عندما تكون الكرة متوقفة وتغطي 1% على الأقل
+                if (currentCoverage >= 1) {
+                    goalAchieved();
+                }
+            }
+            
+            // عند تحقيق الهدف
+            function goalAchieved() {
+                gameActive = false;
+                
+                // إضافة تأثير للكرة والهدف
+                circle.classList.add('goal-effect');
+                target.classList.add('goal-effect');
+                
+                // تشغيل الألعاب النارية
+                createFireworks();
+                
+                // إظهار رسالة الهدف بعد 3 ثوانٍ (بعد انتهاء الألعاب النارية)
+                setTimeout(() => {
+                    finalCoverage.textContent = currentCoverage.toFixed(1);
+                    goalMessage.style.display = 'block';
+                }, 3000);
+            }
+            
+            // تحديث موضع الكرة
+            function updateCirclePosition() {
+                // التأكد من أن الكرة لا تخرج عن حدود الإطار
+                circleX = Math.max(circleRadius, Math.min(circleX, containerWidth - circleRadius));
+                circleY = Math.max(circleRadius, Math.min(circleY, containerHeight - circleRadius));
+                
+                circle.style.left = (circleX - circleRadius) + 'px';
+                circle.style.top = (circleY - circleRadius) + 'px';
+                
+                // تحديث مؤشر التغطية عند كل حركة
+                updateCoverageIndicator();
+            }
+            
+            // تحديث المؤقت
+            function updateTimer() {
+                if (isMoving) {
+                    moveDuration = (Date.now() - moveStartTime) / 1000;
+                    timerValue.textContent = moveDuration.toFixed(1);
+                    
+                    // تحديث شريط التقدم (يتناقص مع الوقت)
+                    const progress = Math.max(0, 100 - (moveDuration / 15 * 100));
+                    timerProgress.style.width = progress + '%';
+                }
+            }
+            
+            // تحديث دوران الكرة حسب اتجاه الحركة
+            function updateBallRotation() {
+                if (isMoving && velocity > 0.5) {
+                    // حساب زاوية الدوران بناءً على اتجاه الحركة
+                    const rotationSpeed = velocity * 10; // زيادة سرعة الدوران مع زيادة سرعة الحركة
+                    
+                    // إزالة فئات الدوران السابقة
+                    circle.classList.remove('ball-rotation', 'ball-rotation-x', 'ball-rotation-y');
+                    
+                    // تحديد اتجاه الدوران بناءً على اتجاه الحركة
+                    if (Math.abs(directionX) > Math.abs(directionY)) {
+                        // الحركة أفقية أكثر - تدوير حول المحور Y
+                        circle.classList.add('ball-rotation-y');
+                    } else {
+                        // الحركة عمودية أكثر - تدوير حول المحور X
+                        circle.classList.add('ball-rotation-x');
+                    }
+                } else {
+                    // إيقاف الدوران عند التوقف
+                    circle.classList.remove('ball-rotation', 'ball-rotation-x', 'ball-rotation-y');
+                }
+            }
+            
+            // بدء الحركة عند لمس الكرة
+            circle.addEventListener('touchstart', handleTouchStart);
+            circle.addEventListener('mousedown', handleMouseDown);
+            
+            function handleTouchStart(e) {
+                e.preventDefault();
+                if (!gameActive) return;
+                
+                const touch = e.touches[0];
+                startMovement(touch.clientX, touch.clientY);
+            }
+            
+            function handleMouseDown(e) {
+                e.preventDefault();
+                if (!gameActive) return;
+                
+                startMovement(e.clientX, e.clientY);
+            }
+            
+            function startMovement(clientX, clientY) {
+                if (!isMoving) {
+                    // إضافة تأثير النبض
+                    circle.classList.add('pulse');
+                    setTimeout(() => circle.classList.remove('pulse'), 500);
+                    
+                    // حساب موقع اللمس النسبي داخل الحاوية
+                    const containerRect = gameContainer.getBoundingClientRect();
+                    const touchPosX = clientX - containerRect.left;
+                    const touchPosY = clientY - containerRect.top;
+                    
+                    // حساب مركز الكرة
+                    const circleCenterX = circleX;
+                    const circleCenterY = circleY;
+                    
+                    // حساب المتجه من مركز الكرة إلى نقطة اللمس
+                    const vectorX = touchPosX - circleCenterX;
+                    const vectorY = touchPosY - circleCenterY;
+                    
+                    // تطبيع المتجه للحصول على اتجاه الوحدة
+                    const length = Math.sqrt(vectorX * vectorX + vectorY * vectorY);
+                    if (length > 0) {
+                        directionX = vectorX / length;
+                        directionY = vectorY / length;
+                    } else {
+                        // إذا كان الضغط في المركز، اختيار اتجاه عشوائي
+                        const randomAngle = Math.random() * Math.PI * 2;
+                        directionX = Math.cos(randomAngle);
+                        directionY = Math.sin(randomAngle);
+                    }
+                    
+                    // بدء الحركة بسرعة عالية
+                    velocity = maxSpeed;
+                    isMoving = true;
+                    moveStartTime = Date.now();
+                    
+                    // بدء الحركة والمؤقت
+                    if (!animationId) {
+                        moveCircle();
+                    }
+                } else {
+                    // إذا كانت الكرة تتحرك، إيقافها
+                    isMoving = false;
+                    velocity = 0;
+                    timerProgress.style.width = '0%';
+                    if (animationId) {
+                        cancelAnimationFrame(animationId);
+                        animationId = null;
+                    }
+                    // إيقاف دوران الكرة
+                    circle.classList.remove('ball-rotation', 'ball-rotation-x', 'ball-rotation-y');
+                }
+            }
+            
+            // دالة تحريك الكرة
+            function moveCircle() {
+                if (!isMoving || !gameActive) return;
+                
+                // تحديث المؤقت
+                updateTimer();
+                
+                // تحديث الموضع بناءً على السرعة والاتجاه
+                circleX += velocity * directionX;
+                circleY += velocity * directionY;
+                
+                // التحقق من الاصطدام بالحواف مع مراعاة نصف القطر
+                if (circleX - circleRadius < 0) {
+                    circleX = circleRadius;
+                    directionX *= -1;
+                } else if (circleX + circleRadius > containerWidth) {
+                    circleX = containerWidth - circleRadius;
+                    directionX *= -1;
+                }
+                
+                if (circleY - circleRadius < 0) {
+                    circleY = circleRadius;
+                    directionY *= -1;
+                } else if (circleY + circleRadius > containerHeight) {
+                    circleY = containerHeight - circleRadius;
+                    directionY *= -1;
+                }
+                
+                // تحديث موضع الكرة
+                updateCirclePosition();
+                
+                // تحديث دوران الكرة
+                updateBallRotation();
+                
+                // تقليل السرعة تدريجيًا
+                velocity *= friction;
+                
+                // إذا كانت السرعة صغيرة جدًا، إيقاف الحركة
+                if (velocity < 0.2) {
+                    velocity = 0;
+                    isMoving = false;
+                    timerProgress.style.width = '0%';
+                    animationId = null;
+                    
+                    // إيقاف دوران الكرة
+                    circle.classList.remove('ball-rotation', 'ball-rotation-x', 'ball-rotation-y');
+                    
+                    // التحقق من تحقيق الهدف بعد التوقف
+                    setTimeout(checkGoal, 100);
+                    return;
+                }
+                
+                // الاستمرار في الحركة
+                animationId = requestAnimationFrame(moveCircle);
+            }
+            
+            // استمرار اللعبة بعد تحقيق الهدف
+            continueBtn.addEventListener('click', function() {
+                goalMessage.style.display = 'none';
+                points++;
+                pointsDisplay.textContent = points;
+                
+                // إزالة التأثيرات
+                circle.classList.remove('goal-effect');
+                target.classList.remove('goal-effect');
+                target.classList.remove('coverage-good');
+                
+                // إعادة تعيين موقع الكرة
+                circleX = containerWidth / 2;
+                circleY = containerHeight / 2;
+                updateCirclePosition();
+                
+                // وضع هدف جديد
+                placeTarget();
+                
+                // تفعيل اللعبة من جديد
+                gameActive = true;
+            });
+            
+            // تهيئة اللعبة
+            function initGame() {
+                adjustCircleSize();
+                updateContainerSize();
+                circleX = containerWidth / 2;
+                circleY = containerHeight / 2;
+                updateCirclePosition();
+                placeTarget();
+                updateCoverageIndicator();
+            }
+            
+            // إعادة حساب الأبعاد عند تغيير حجم النافذة
+            window.addEventListener('resize', function() {
+                if (gameActive) {
+                    adjustCircleSize();
+                    updateContainerSize();
+                    updateCirclePosition();
+                }
+            });
+        });
+        // تسجيل Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registered successfully');
+                    })
+                    .catch(function(error) {
+                        console.log('ServiceWorker registration failed: ', error);
+                    });
+            });
+        }
+        
+        // منع السلوك الافتراضي لللمس
+        document.addEventListener('touchmove', function(e) {
+            if (e.scale !== 1) {
+                e.preventDefault();
+            }
+        }, { passive: false });
+        
+        // منع التكبير بالدبل تاب
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', function(e) {
+            const now = (new Date()).getTime();
+            if (now - lastTouchEnd <= 300) {
+                e.preventDefault();
+            }
+            lastTouchEnd = now;
+        }, false);
+    </script>
+</body>
+</html>
