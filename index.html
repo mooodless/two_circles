@@ -219,74 +219,44 @@
             height: 70vh;
             max-width: 500px;
             max-height: 70vh;
-            background-color: black;
+            background-color: #1a1a2e; /* لون أفتح قليلاً لرؤية أفضل */
             display: none;
             border: 3px solid #4CAF50;
             border-radius: 10px;
             box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
             overflow: hidden;
-            perspective: 800px; /* إضافة منظور ثلاثي الأبعاد */
         }
         
-        /* الكرة ثلاثية الأبعاد */
+        /* الكرة - نسخة مبسطة للتأكد من الظهور */
         #circle {
             position: absolute;
             width: 60px;
             height: 60px;
+            background: radial-gradient(circle at 30% 30%, #ff3333, #990000);
+            border-radius: 50%;
             cursor: pointer;
-            transition: transform 0.1s;
-            touch-action: none;
-            transform-style: preserve-3d;
+            box-shadow: 0 0 30px #ff0000, inset -5px -5px 10px rgba(0,0,0,0.5), inset 5px 5px 10px rgba(255,255,255,0.5);
             z-index: 10;
-            /* إضافة خلفية للكرة */
-            background: radial-gradient(circle at 30% 30%, #ff4d4d, #cc0000);
-            border-radius: 50%;
-            box-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
-        }
-        
-        /* الهيكل الداخلي للكرة ثلاثية الأبعاد */
-        .sphere-3d {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            animation: sphereRotate 0s linear infinite;
-        }
-        
-        /* الأوجه التي تشكل الكرة - 16 وجه لتكوين شكل كروي */
-        .sphere-face {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #ff4d4d, #cc0000);
-            box-shadow: 
-                inset -5px -10px 20px rgba(0,0,0,0.5),
-                inset 5px 5px 20px rgba(255,255,255,0.6);
+            left: 0;
+            top: 0;
+            /* إضافة حدود بيضاء خفيفة */
             border: 2px solid rgba(255, 255, 255, 0.3);
-            backface-visibility: visible;
-            opacity: 0.9; /* شفافية خفيفة لإظهار الطبقات */
         }
         
-        /* توزيع الأوجه لتشكيل كرة حقيقية */
-        .face-0 { transform: rotateY(0deg) translateZ(5px); }
-        .face-1 { transform: rotateY(45deg) translateZ(5px); }
-        .face-2 { transform: rotateY(90deg) translateZ(5px); }
-        .face-3 { transform: rotateY(135deg) translateZ(5px); }
-        .face-4 { transform: rotateY(180deg) translateZ(5px); }
-        .face-5 { transform: rotateY(225deg) translateZ(5px); }
-        .face-6 { transform: rotateY(270deg) translateZ(5px); }
-        .face-7 { transform: rotateY(315deg) translateZ(5px); }
-        .face-8 { transform: rotateX(45deg) translateZ(5px); }
-        .face-9 { transform: rotateX(-45deg) translateZ(5px); }
-        .face-10 { transform: rotateX(90deg) translateZ(5px); }
-        .face-11 { transform: rotateX(-90deg) translateZ(5px); }
-        .face-12 { transform: rotateX(135deg) translateZ(5px); }
-        .face-13 { transform: rotateX(-135deg) translateZ(5px); }
-        .face-14 { transform: rotateX(180deg) translateZ(5px); }
-        .face-15 { transform: rotateX(0deg) rotateY(0deg) translateZ(5px); }
+        /* إضافة نقطة ضوء صغيرة */
+        #circle::after {
+            content: '';
+            position: absolute;
+            top: 10%;
+            left: 15%;
+            width: 20%;
+            height: 20%;
+            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 80%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
         
-        /* الهدف - دائرة مسطحة (يبقى كما هو) */
+        /* الهدف - دائرة زرقاء */
         #target {
             position: absolute;
             width: 60px;
@@ -445,12 +415,6 @@
             box-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
         }
         
-        /* دوران الكرة أثناء الحركة */
-        @keyframes spin {
-            from { transform: rotateX(0deg) rotateY(0deg); }
-            to { transform: rotateX(360deg) rotateY(360deg); }
-        }
-        
         /* الألعاب النارية - تغطي كامل الصفحة */
         .firework {
             position: fixed;
@@ -525,7 +489,7 @@
         <div id="instructions-container">
             <h2>طريقة اللعب</h2>
             <ul>
-                <li>🔴 المس الكرة ثلاثية الأبعاد لتحريكها في نفس اتجاه المس</li>
+                <li>🔴 المس الكرة الحمراء لتحريكها في نفس اتجاه المس</li>
                 <li>🎯 حاول تغطية 1% من الدائرة الزرقاء عند توقف الكرة</li>
                 <li>⏱️ تتحرك الكرة بسرعة في البداية ثم تتباطأ تدريجياً</li>
                 <li>🎆 عند تحقيق الهدف، ستظهر ألعاب نارية كاملة الشاشة لمدة 3 ثوانٍ</li>
@@ -554,27 +518,8 @@
 
     <!-- شاشة اللعبة -->
     <div id="game-container">
-        <!-- الكرة ثلاثية الأبعاد -->
-        <div id="circle">
-            <div class="sphere-3d" id="sphere3D">
-                <div class="sphere-face face-0"></div>
-                <div class="sphere-face face-1"></div>
-                <div class="sphere-face face-2"></div>
-                <div class="sphere-face face-3"></div>
-                <div class="sphere-face face-4"></div>
-                <div class="sphere-face face-5"></div>
-                <div class="sphere-face face-6"></div>
-                <div class="sphere-face face-7"></div>
-                <div class="sphere-face face-8"></div>
-                <div class="sphere-face face-9"></div>
-                <div class="sphere-face face-10"></div>
-                <div class="sphere-face face-11"></div>
-                <div class="sphere-face face-12"></div>
-                <div class="sphere-face face-13"></div>
-                <div class="sphere-face face-14"></div>
-                <div class="sphere-face face-15"></div>
-            </div>
-        </div>
+        <!-- الكرة -->
+        <div id="circle"></div>
         <div id="target"></div>
         <div id="overlay"></div>
         <div id="score">الأهداف: <span id="points">0</span></div>
@@ -604,7 +549,6 @@
             const gameControls = document.getElementById('game-controls');
             const gameContainer = document.getElementById('game-container');
             const circle = document.getElementById('circle');
-            const sphere3D = document.getElementById('sphere3D');
             const target = document.getElementById('target');
             const overlay = document.getElementById('overlay');
             const pointsDisplay = document.getElementById('points');
@@ -848,9 +792,6 @@
                 circle.classList.add('goal-effect');
                 target.classList.add('goal-effect');
                 
-                // إيقاف دوران الكرة
-                sphere3D.style.animation = 'none';
-                
                 // تشغيل الألعاب النارية
                 createFireworks();
                 
@@ -941,9 +882,6 @@
                     isMoving = true;
                     moveStartTime = Date.now();
                     
-                    // إضافة دوران للكرة أثناء الحركة
-                    sphere3D.style.animation = 'spin 0.5s linear infinite';
-                    
                     // بدء الحركة والمؤقت
                     if (!animationId) {
                         moveCircle();
@@ -953,9 +891,6 @@
                     isMoving = false;
                     velocity = 0;
                     timerProgress.style.width = '0%';
-                    
-                    // إيقاف دوران الكرة
-                    sphere3D.style.animation = 'none';
                     
                     if (animationId) {
                         cancelAnimationFrame(animationId);
@@ -1006,9 +941,6 @@
                     velocity = 0;
                     isMoving = false;
                     timerProgress.style.width = '0%';
-                    
-                    // إيقاف دوران الكرة
-                    sphere3D.style.animation = 'none';
                     
                     animationId = null;
                     
