@@ -2,1030 +2,418 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>لعبة الكرة ثلاثية الأبعاد</title>
-    
-    <!-- إضافة وصف وأيقونة للتطبيق -->
-    <meta name="description" content="لعبة الكرة ثلاثية الأبعاد - تحدي الدقة والسرعة">
-    <link rel="icon" type="image/png" href="images/bals.png">
-    
-    <!-- إضافة خاصية PWA للتطبيق -->
-    <meta name="theme-color" content="#4CAF50">
-    <link rel="apple-touch-icon" href="images/bals.png">
-    <!-- إضافة Web App Manifest -->
-    <link rel="manifest" href="manifest.json">
-    
-    <!-- Meta tags for iOS -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="لعبة الكرة ثلاثية الأبعاد">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>لعبة الشكل الهندسي ثلاثي الأبعاد</title>
     <style>
-        /* أضف هذا النمط لمنع التأثيرات غير المرغوب فيها */
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            touch-action: manipulation;
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
         body {
-            background-color: black;
-            width: 100vw;
-            height: 100vh;
+            margin: 0;
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            font-family: Arial, sans-serif;
-            position: fixed;
-            top: 0;
-            left: 0;
-            padding: 10px;
+            font-family: 'Arial', sans-serif;
         }
         
-        /* شاشة البداية */
-        #start-screen {
+        #info {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            top: 20px;
+            left: 20px;
             color: white;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-start;
-            align-items: center;
-            z-index: 1000;
-            padding: 20px;
-            text-align: center;
-            overflow-y: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        
-        /* رأس التطبيق مع الصورة */
-        .app-header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .app-icon {
-            width: 100px;
-            height: 100px;
-            border-radius: 20px;
-            margin-bottom: 15px;
-            border: 3px solid #4CAF50;
-            box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
-            object-fit: cover;
-        }
-        
-        #start-screen h1 {
-            font-size: 2rem;
-            margin-bottom: 15px;
-            color: #4CAF50;
-            text-shadow: 0 0 10px rgba(76, 175, 80, 0.5);
-        }
-        
-        #instructions-container {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 15px;
-            margin: 15px 0;
-            max-width: 95%;
-            backdrop-filter: blur(10px);
-        }
-        
-        #instructions-container h2 {
-            color: #00aaff;
-            margin-bottom: 12px;
-            font-size: 1.3rem;
-        }
-        
-        #instructions-container ul {
-            text-align: right;
-            list-style-type: none;
-            padding: 0;
-        }
-        
-        #instructions-container li {
-            margin-bottom: 8px;
-            padding: 6px;
-            background-color: rgba(0, 0, 0, 0.3);
-            border-radius: 8px;
-            font-size: 0.9rem;
-        }
-        
-        .start-button {
-            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
-            border: none;
-            color: white;
-            padding: 12px 30px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 1.1rem;
-            margin: 15px 0;
-            cursor: pointer;
-            border-radius: 50px;
-            transition: all 0.3s;
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4);
-            min-height: 44px;
-        }
-        
-        .start-button:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(76, 175, 80, 0.6);
-        }
-        
-        /* عناصر التحكم خارج الحاوية */
-        #game-controls {
-            width: 100%;
-            max-width: 500px;
-            margin-bottom: 10px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            color: white;
-            z-index: 20;
-        }
-        
-        /* التعديل: عرض المؤشرات بشكل أفقي */
-        .indicators-container {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        
-        #timer-container, #coverage-indicator {
-            flex: 1;
-            text-align: center;
-            background-color: rgba(0, 0, 0, 0.5);
-            padding: 8px;
-            border-radius: 8px;
-            border: 1px solid #4CAF50;
-            min-width: 0;
-        }
-        
-        #timer-bar, #coverage-bar {
-            width: 85%;
-            height: 6px;
-            background-color: #333;
-            margin: 5px auto;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        #timer-progress {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(to right, #ff0000, #ff9900);
-            transition: width 0.5s;
-        }
-        
-        #coverage-progress {
-            height: 100%;
-            width: 0%;
-            background: linear-gradient(to right, #ff9900, #4CAF50);
-            transition: width 0.3s;
-        }
-        
-        /* شاشة اللعبة */
-        #game-container {
-            position: relative;
-            width: 100%;
-            height: 70vh;
-            max-width: 500px;
-            max-height: 70vh;
-            background-color: #1a1a2e; /* لون أفتح قليلاً لرؤية أفضل */
-            display: none;
-            border: 3px solid #4CAF50;
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(76, 175, 80, 0.5);
-            overflow: hidden;
-        }
-        
-        /* الكرة - نسخة مبسطة للتأكد من الظهور */
-        #circle {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            background: radial-gradient(circle at 30% 30%, #ff3333, #990000);
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 0 30px #ff0000, inset -5px -5px 10px rgba(0,0,0,0.5), inset 5px 5px 10px rgba(255,255,255,0.5);
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 30px;
+            pointer-events: none;
             z-index: 10;
-            left: 0;
-            top: 0;
-            /* إضافة حدود بيضاء خفيفة */
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        /* إضافة نقطة ضوء صغيرة */
-        #circle::after {
-            content: '';
-            position: absolute;
-            top: 10%;
-            left: 15%;
-            width: 20%;
-            height: 20%;
-            background: radial-gradient(circle, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 80%);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-        
-        /* الهدف - دائرة زرقاء */
-        #target {
-            position: absolute;
-            width: 60px;
-            height: 60px;
-            background: radial-gradient(circle at 30% 30%, #00aaff, #0066cc);
-            border-radius: 50%;
-            box-shadow: 0 0 15px rgba(0, 170, 255, 0.7);
-            z-index: 5;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-        }
-        
-        #overlay {
-            position: absolute;
-            width: 54px;
-            height: 54px;
-            background-color: rgba(255, 255, 0, 0.3);
-            border-radius: 50%;
-            border: 1px dashed yellow;
-            z-index: 7;
-            pointer-events: none;
-            display: none;
-        }
-        
-        @media (max-width: 480px) {
-            #circle, #target, #overlay {
-                width: 50px;
-                height: 50px;
-            }
-            
-            #overlay {
-                width: 45px;
-                height: 45px;
-            }
-            
-            .app-icon {
-                width: 80px;
-                height: 80px;
-            }
-            
-            /* التعديل: تحسين التخطيط للشاشات الصغيرة */
-            .indicators-container {
-                flex-direction: column;
-                gap: 5px;
-            }
-            
-            #timer-container, #coverage-indicator {
-                width: 100%;
-            }
+            font-size: 16px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
         }
         
         #score {
             position: absolute;
-            bottom: 15px;
-            width: 100%;
-            text-align: center;
+            top: 20px;
+            right: 20px;
             color: white;
-            font-size: 20px;
-            z-index: 20;
-            text-shadow: 0 0 10px rgba(0,0,0,0.5);
-        }
-        
-        #goal-message {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background-color: rgba(0, 0, 0, 0.95);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            z-index: 200;
-            display: none;
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.5);
-            border: 3px solid #4CAF50;
-            width: 90%;
-            max-width: 350px;
-            backdrop-filter: blur(10px);
-        }
-        
-        #goal-message h2 {
-            margin-bottom: 15px;
-            color: #4CAF50;
-            font-size: 1.5rem;
-            text-shadow: 0 0 10px rgba(76, 175, 80, 0.7);
-        }
-        
-        #goal-message p {
-            margin-bottom: 20px;
-            font-size: 1.1rem;
-        }
-        
-        .button {
-            background-color: #4CAF50;
-            border: none;
-            color: white;
-            padding: 12px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
+            background: rgba(0,0,0,0.7);
+            padding: 10px 20px;
+            border-radius: 30px;
+            pointer-events: none;
+            z-index: 10;
             font-size: 16px;
-            margin: 8px 10px;
-            cursor: pointer;
-            border-radius: 8px;
-            transition: all 0.3s;
-            min-height: 44px;
-            min-width: 100px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
         }
         
-        .button:hover {
-            background-color: #45a049;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
-        }
-        
-        .button.exit {
-            background-color: #f44336;
-        }
-        
-        .button.exit:hover {
-            background-color: #d32f2f;
-        }
-        
-        .pulse {
-            animation: pulse 0.5s;
+        #instructions {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            background: rgba(0,0,0,0.5);
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 18px;
+            text-align: center;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
+            white-space: nowrap;
+            z-index: 10;
+            animation: pulse 2s infinite;
         }
         
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+            0% { opacity: 0.7; transform: translateX(-50%) scale(1); }
+            50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
+            100% { opacity: 0.7; transform: translateX(-50%) scale(1); }
         }
         
-        .target-pulse {
-            animation: targetPulse 1s infinite;
-        }
-        
-        @keyframes targetPulse {
-            0% { box-shadow: 0 0 15px rgba(0, 170, 255, 0.7); }
-            50% { box-shadow: 0 0 25px rgba(0, 170, 255, 1); }
-            100% { box-shadow: 0 0 15px rgba(0, 170, 255, 0.7); }
-        }
-        
-        .goal-effect {
-            animation: goalEffect 1s;
-        }
-        
-        @keyframes goalEffect {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.5); opacity: 0.7; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-        
-        .coverage-good {
-            box-shadow: 0 0 20px rgba(76, 175, 80, 0.8);
-        }
-        
-        /* الألعاب النارية - تغطي كامل الصفحة */
-        .firework {
-            position: fixed;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 100;
-            animation: firework 1.5s ease-out forwards;
-        }
-        
-        @keyframes firework {
-            0% { 
-                transform: translate(var(--start-x), var(--start-y));
-                width: 6px;
-                height: 6px;
-                opacity: 1;
+        @media (max-width: 600px) {
+            #instructions {
+                font-size: 14px;
+                padding: 10px 16px;
+                white-space: normal;
+                width: 80%;
             }
-            50% {
-                width: 4px;
-                height: 4px;
-                opacity: 1;
-            }
-            100% { 
-                transform: translate(var(--end-x), var(--end-y));
-                width: 0px;
-                height: 0px;
-                opacity: 0;
-            }
-        }
-        
-        /* تأثير خلفية الألعاب النارية */
-        .fireworks-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.7) 100%);
-            pointer-events: none;
-            z-index: 99;
-            animation: overlayFade 3s ease-in-out;
-        }
-        
-        @keyframes overlayFade {
-            0% { opacity: 0; }
-            20% { opacity: 1; }
-            80% { opacity: 1; }
-            100% { opacity: 0; }
-        }
-        
-        /* رسالة خطأ في حالة عدم وجود الصورة */
-        .image-error {
-            display: none;
-            color: #ff6b6b;
-            background: rgba(255, 107, 107, 0.1);
-            padding: 10px;
-            border-radius: 8px;
-            margin: 10px 0;
-            border: 1px solid #ff6b6b;
         }
     </style>
 </head>
 <body>
-    <!-- شاشة البداية -->
-    <div id="start-screen">
-        <div class="app-header">
-            <h1>لعبة الكرة ثلاثية الأبعاد</h1>
-        </div>
+    <div id="info">🔮 الشكل الهندسي ثلاثي الأبعاد</div>
+    <div id="score">النقاط: <span id="scoreValue">0</span></div>
+    <div id="instructions">👆 المس الشاشة لتحريك الشكل حول المركز</div>
+
+    <!-- استيراد مكتبة Three.js -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.128.0/build/three.module.js"
+            }
+        }
+    </script>
+
+    <script type="module">
+        import * as THREE from 'three';
+        import { OrbitControls } from 'https://unpkg.com/three@0.128.0/examples/jsm/controls/OrbitControls.js';
+
+        // --- إعداد المشهد ---
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x0a0a20); // لون خلفية داكن
         
-        <button id="start-button" class="start-button">بدء اللعبة</button>
-        <div id="instructions-container">
-            <h2>طريقة اللعب</h2>
-            <ul>
-                <li>🔴 المس الكرة الحمراء لتحريكها في نفس اتجاه المس</li>
-                <li>🎯 حاول تغطية 1% من الدائرة الزرقاء عند توقف الكرة</li>
-                <li>⏱️ تتحرك الكرة بسرعة في البداية ثم تتباطأ تدريجياً</li>
-                <li>🎆 عند تحقيق الهدف، ستظهر ألعاب نارية كاملة الشاشة لمدة 3 ثوانٍ</li>
-                <li>🔄 يمكنك إيقاف الكرة المتحركة بلمسها مرة أخرى</li>
-            </ul>
-        </div>
-    </div>
-
-    <!-- عناصر التحكم خارج الحاوية -->
-    <div id="game-controls" style="display: none;">
-        <div class="indicators-container">
-            <div id="timer-container">
-                <div>مدة الحركة: <span id="timer-value">0</span> ثانية</div>
-                <div id="timer-bar">
-                    <div id="timer-progress"></div>
-                </div>
-            </div>
-            <div id="coverage-indicator">
-                <div>التغطية: <span id="coverage-value">0</span>%</div>
-                <div id="coverage-bar">
-                    <div id="coverage-progress"></div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- شاشة اللعبة -->
-    <div id="game-container">
-        <!-- الكرة -->
-        <div id="circle"></div>
-        <div id="target"></div>
-        <div id="overlay"></div>
-        <div id="score">الأهداف: <span id="points">0</span></div>
+        // --- إعداد الكاميرا (منظور متحرك) ---
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(5, 3, 8);
+        camera.lookAt(0, 0, 0);
         
-        <div id="goal-message">
-            <h2>🎯 هدف رائع!</h2>
-            <p>لقد غطيت <span id="final-coverage">0</span>% من الهدف</p>
-            <div>
-                <button id="continue-btn" class="button">استمرار</button>
-                <button id="exit-btn" class="button exit">إنهاء اللعبة</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // منع التكبير والتصغير
-            document.addEventListener('touchstart', function(e) {
-                if (e.touches.length > 1) {
-                    e.preventDefault();
-                }
-            });
-            
-            // عناصر واجهة المستخدم
-            const startScreen = document.getElementById('start-screen');
-            const startButton = document.getElementById('start-button');
-            const gameControls = document.getElementById('game-controls');
-            const gameContainer = document.getElementById('game-container');
-            const circle = document.getElementById('circle');
-            const target = document.getElementById('target');
-            const overlay = document.getElementById('overlay');
-            const pointsDisplay = document.getElementById('points');
-            const timerValue = document.getElementById('timer-value');
-            const timerProgress = document.getElementById('timer-progress');
-            const coverageValue = document.getElementById('coverage-value');
-            const coverageProgress = document.getElementById('coverage-progress');
-            const goalMessage = document.getElementById('goal-message');
-            const finalCoverage = document.getElementById('final-coverage');
-            const continueBtn = document.getElementById('continue-btn');
-            const exitBtn = document.getElementById('exit-btn');
-            
-            // متغيرات اللعبة
-            let points = 0;
-            let isMoving = false;
-            let velocity = 0;
-            let directionX = 0;
-            let directionY = 0;
-            let friction = 0.985;
-            let maxSpeed = 12;
-            let animationId;
-            let moveStartTime = 0;
-            let moveDuration = 0;
-            let gameActive = false;
-            let currentCoverage = 0;
-            
-            // أبعاد الكرة والحاوية
-            let circleRadius = 30;
-            let targetRadius = 30;
-            let containerWidth, containerHeight;
-            
-            // موضع الكرة الحالي
-            let circleX, circleY;
-            
-            // ضبط نصف القطر بناءً على حجم الشاشة
-            function adjustCircleSize() {
-                if (window.innerWidth <= 480) {
-                    circleRadius = 25;
-                    targetRadius = 25;
-                    circle.style.width = '50px';
-                    circle.style.height = '50px';
-                    target.style.width = '50px';
-                    target.style.height = '50px';
-                } else {
-                    circleRadius = 30;
-                    targetRadius = 30;
-                    circle.style.width = '60px';
-                    circle.style.height = '60px';
-                    target.style.width = '60px';
-                    target.style.height = '60px';
-                }
-            }
-            
-            // بدء اللعبة
-            startButton.addEventListener('click', function() {
-                startScreen.style.display = 'none';
-                gameControls.style.display = 'flex';
-                gameContainer.style.display = 'block';
-                gameActive = true;
-                initGame();
-            });
-            
-            // إنهاء اللعبة
-            exitBtn.addEventListener('click', function() {
-                alert(`🎉 لقد أنهيت اللعبة! \n\nعدد الأهداف: ${points}`);
-                location.reload();
-            });
-            
-            // تحديث أبعاد الحاوية
-            function updateContainerSize() {
-                containerWidth = gameContainer.clientWidth;
-                containerHeight = gameContainer.clientHeight;
-            }
-            
-            // وضع الهدف في مكان عشوائي
-            function placeTarget() {
-                updateContainerSize();
-                
-                // حساب الحد الأدنى والأقصى للمواضع مع مراعاة نصف القطر
-                const minX = targetRadius;
-                const maxX = containerWidth - targetRadius;
-                const minY = targetRadius;
-                const maxY = containerHeight - targetRadius;
-                
-                const randomX = minX + Math.random() * (maxX - minX);
-                const randomY = minY + Math.random() * (maxY - minY);
-                
-                target.style.left = randomX + 'px';
-                target.style.top = randomY + 'px';
-                
-                // تحديث موقع الطبقة الشفافة
-                const overlayRadius = window.innerWidth <= 480 ? 22.5 : 27;
-                overlay.style.left = (randomX + targetRadius - overlayRadius) + 'px';
-                overlay.style.top = (randomY + targetRadius - overlayRadius) + 'px';
-                
-                // إضافة تأثير النبض للهدف
-                target.classList.add('target-pulse');
-            }
-            
-            // حساب نسبة التغطية
-            function calculateCoverage() {
-                // الحصول على المواقع النسبية داخل الحاوية
-                const circleLeft = parseFloat(circle.style.left) || 0;
-                const circleTop = parseFloat(circle.style.top) || 0;
-                const targetLeft = parseFloat(target.style.left) || 0;
-                const targetTop = parseFloat(target.style.top) || 0;
-                
-                // حساب المسافة بين مركزي الدائرتين
-                const circleCenterX = circleLeft + circleRadius;
-                const circleCenterY = circleTop + circleRadius;
-                const targetCenterX = targetLeft + targetRadius;
-                const targetCenterY = targetTop + targetRadius;
-                
-                const distance = Math.sqrt(
-                    Math.pow(circleCenterX - targetCenterX, 2) + 
-                    Math.pow(circleCenterY - targetCenterY, 2)
-                );
-                
-                // إذا كانت المسافة أكبر من مجموع نصف القطرين، فلا يوجد تداخل
-                if (distance >= circleRadius + targetRadius) {
-                    return 0;
-                }
-                
-                // إذا كانت دائرة واحدة داخل الأخرى بالكامل
-                if (distance <= Math.abs(circleRadius - targetRadius)) {
-                    return 100;
-                }
-                
-                // حساب مساحة التداخل بين الدائرتين
-                const r = circleRadius;
-                const R = targetRadius;
-                const d = distance;
-                
-                const part1 = r*r * Math.acos((d*d + r*r - R*R) / (2*d*r));
-                const part2 = R*R * Math.acos((d*d + R*R - r*r) / (2*d*R));
-                const part3 = 0.5 * Math.sqrt((-d+r+R)*(d+r-R)*(d-r+R)*(d+r+R));
-                
-                const intersectionArea = part1 + part2 - part3;
-                const targetArea = Math.PI * R * R;
-                
-                // نسبة التغطية (مساحة التداخل / مساحة الهدف)
-                const coverage = (intersectionArea / targetArea) * 100;
-                
-                return Math.min(100, Math.max(0, coverage));
-            }
-            
-            // تحديث مؤشر التغطية
-            function updateCoverageIndicator() {
-                currentCoverage = calculateCoverage();
-                coverageValue.textContent = currentCoverage.toFixed(1);
-                coverageProgress.style.width = currentCoverage + '%';
-                
-                // إظهار أو إخفاء الطبقة الشفافة
-                if (currentCoverage > 0 && !isMoving) {
-                    overlay.style.display = 'block';
-                    if (currentCoverage >= 1) {
-                        target.classList.add('coverage-good');
-                    } else {
-                        target.classList.remove('coverage-good');
-                    }
-                } else {
-                    overlay.style.display = 'none';
-                    target.classList.remove('coverage-good');
-                }
-            }
-            
-            // إنشاء الألعاب النارية التي تغطي كامل الصفحة
-            function createFireworks() {
-                const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff', '#ff9900', '#ff66cc', '#66ff66'];
-                const body = document.body;
-                
-                // إنشاء طبقة خلفية للألعاب النارية
-                const overlay = document.createElement('div');
-                overlay.className = 'fireworks-overlay';
-                body.appendChild(overlay);
-                
-                // إنشاء عدد كبير من الألعاب النارية لتغطية كامل الصفحة
-                const fireworkCount = 150;
-                
-                for (let i = 0; i < fireworkCount; i++) {
-                    const firework = document.createElement('div');
-                    firework.className = 'firework';
-                    
-                    // لون عشوائي
-                    const color = colors[Math.floor(Math.random() * colors.length)];
-                    firework.style.backgroundColor = color;
-                    
-                    // موقع البداية عشوائي في كامل الصفحة
-                    const startX = Math.random() * window.innerWidth;
-                    const startY = Math.random() * window.innerHeight;
-                    
-                    // اتجاه ومسافة عشوائية
-                    const angle = Math.random() * Math.PI * 2;
-                    const distance = 50 + Math.random() * 200;
-                    const endX = startX + Math.cos(angle) * distance;
-                    const endY = startY + Math.sin(angle) * distance;
-                    
-                    // تعيين المتغيرات CSS للحركة
-                    firework.style.setProperty('--start-x', '0px');
-                    firework.style.setProperty('--start-y', '0px');
-                    firework.style.setProperty('--end-x', (endX - startX) + 'px');
-                    firework.style.setProperty('--end-y', (endY - startY) + 'px');
-                    
-                    // الموضع المطلق
-                    firework.style.left = startX + 'px';
-                    firework.style.top = startY + 'px';
-                    
-                    body.appendChild(firework);
-                    
-                    // إزالة الألعاب النارية بعد انتهاء الحركة
-                    setTimeout(() => {
-                        if (firework.parentNode) {
-                            firework.parentNode.removeChild(firework);
-                        }
-                    }, 3000);
-                }
-                
-                // إزالة طبقة الخلفية بعد 3 ثوانٍ
-                setTimeout(() => {
-                    if (overlay.parentNode) {
-                        overlay.parentNode.removeChild(overlay);
-                    }
-                }, 3000);
-            }
-            
-            // التحقق من تحقيق الهدف
-            function checkGoal() {
-                if (!gameActive || isMoving) return;
-                
-                // يتم تسجيل الهدف فقط عندما تكون الكرة متوقفة وتغطي 1% على الأقل
-                if (currentCoverage >= 1) {
-                    goalAchieved();
-                }
-            }
-            
-            // عند تحقيق الهدف
-            function goalAchieved() {
-                gameActive = false;
-                
-                // إضافة تأثير للكرة والهدف
-                circle.classList.add('goal-effect');
-                target.classList.add('goal-effect');
-                
-                // تشغيل الألعاب النارية
-                createFireworks();
-                
-                // إظهار رسالة الهدف بعد 3 ثوانٍ (بعد انتهاء الألعاب النارية)
-                setTimeout(() => {
-                    finalCoverage.textContent = currentCoverage.toFixed(1);
-                    goalMessage.style.display = 'block';
-                }, 3000);
-            }
-            
-            // تحديث موضع الكرة
-            function updateCirclePosition() {
-                // التأكد من أن الكرة لا تخرج عن حدود الإطار
-                circleX = Math.max(circleRadius, Math.min(circleX, containerWidth - circleRadius));
-                circleY = Math.max(circleRadius, Math.min(circleY, containerHeight - circleRadius));
-                
-                circle.style.left = (circleX - circleRadius) + 'px';
-                circle.style.top = (circleY - circleRadius) + 'px';
-                
-                // تحديث مؤشر التغطية عند كل حركة
-                updateCoverageIndicator();
-            }
-            
-            // تحديث المؤقت
-            function updateTimer() {
-                if (isMoving) {
-                    moveDuration = (Date.now() - moveStartTime) / 1000;
-                    timerValue.textContent = moveDuration.toFixed(1);
-                    
-                    // تحديث شريط التقدم (يتناقص مع الوقت)
-                    const progress = Math.max(0, 100 - (moveDuration / 15 * 100));
-                    timerProgress.style.width = progress + '%';
-                }
-            }
-            
-            // بدء الحركة عند لمس الكرة
-            circle.addEventListener('touchstart', handleTouchStart);
-            circle.addEventListener('mousedown', handleMouseDown);
-            
-            function handleTouchStart(e) {
-                e.preventDefault();
-                if (!gameActive) return;
-                
-                const touch = e.touches[0];
-                startMovement(touch.clientX, touch.clientY);
-            }
-            
-            function handleMouseDown(e) {
-                e.preventDefault();
-                if (!gameActive) return;
-                
-                startMovement(e.clientX, e.clientY);
-            }
-            
-            function startMovement(clientX, clientY) {
-                if (!isMoving) {
-                    // إضافة تأثير النبض
-                    circle.classList.add('pulse');
-                    setTimeout(() => circle.classList.remove('pulse'), 500);
-                    
-                    // حساب موقع اللمس النسبي داخل الحاوية
-                    const containerRect = gameContainer.getBoundingClientRect();
-                    const touchPosX = clientX - containerRect.left;
-                    const touchPosY = clientY - containerRect.top;
-                    
-                    // حساب مركز الكرة
-                    const circleCenterX = circleX;
-                    const circleCenterY = circleY;
-                    
-                    // حساب المتجه من مركز الكرة إلى نقطة اللمس
-                    const vectorX = touchPosX - circleCenterX;
-                    const vectorY = touchPosY - circleCenterY;
-                    
-                    // تطبيع المتجه للحصول على اتجاه الوحدة
-                    const length = Math.sqrt(vectorX * vectorX + vectorY * vectorY);
-                    if (length > 0) {
-                        directionX = vectorX / length;
-                        directionY = vectorY / length;
-                    } else {
-                        // إذا كان الضغط في المركز، اختيار اتجاه عشوائي
-                        const randomAngle = Math.random() * Math.PI * 2;
-                        directionX = Math.cos(randomAngle);
-                        directionY = Math.sin(randomAngle);
-                    }
-                    
-                    // بدء الحركة بسرعة عالية
-                    velocity = maxSpeed;
-                    isMoving = true;
-                    moveStartTime = Date.now();
-                    
-                    // بدء الحركة والمؤقت
-                    if (!animationId) {
-                        moveCircle();
-                    }
-                } else {
-                    // إذا كانت الكرة تتحرك، إيقافها
-                    isMoving = false;
-                    velocity = 0;
-                    timerProgress.style.width = '0%';
-                    
-                    if (animationId) {
-                        cancelAnimationFrame(animationId);
-                        animationId = null;
-                    }
-                    
-                    // التحقق من تحقيق الهدف بعد التوقف
-                    setTimeout(checkGoal, 100);
-                }
-            }
-            
-            // دالة تحريك الكرة
-            function moveCircle() {
-                if (!isMoving || !gameActive) return;
-                
-                // تحديث المؤقت
-                updateTimer();
-                
-                // تحديث الموضع بناءً على السرعة والاتجاه
-                circleX += velocity * directionX;
-                circleY += velocity * directionY;
-                
-                // التحقق من الاصطدام بالحواف مع مراعاة نصف القطر
-                if (circleX - circleRadius < 0) {
-                    circleX = circleRadius;
-                    directionX *= -1;
-                } else if (circleX + circleRadius > containerWidth) {
-                    circleX = containerWidth - circleRadius;
-                    directionX *= -1;
-                }
-                
-                if (circleY - circleRadius < 0) {
-                    circleY = circleRadius;
-                    directionY *= -1;
-                } else if (circleY + circleRadius > containerHeight) {
-                    circleY = containerHeight - circleRadius;
-                    directionY *= -1;
-                }
-                
-                // تحديث موضع الكرة
-                updateCirclePosition();
-                
-                // تقليل السرعة تدريجيًا
-                velocity *= friction;
-                
-                // إذا كانت السرعة صغيرة جدًا، إيقاف الحركة
-                if (velocity < 0.2) {
-                    velocity = 0;
-                    isMoving = false;
-                    timerProgress.style.width = '0%';
-                    
-                    animationId = null;
-                    
-                    // التحقق من تحقيق الهدف بعد التوقف
-                    setTimeout(checkGoal, 100);
-                    return;
-                }
-                
-                // الاستمرار في الحركة
-                animationId = requestAnimationFrame(moveCircle);
-            }
-            
-            // استمرار اللعبة بعد تحقيق الهدف
-            continueBtn.addEventListener('click', function() {
-                goalMessage.style.display = 'none';
-                points++;
-                pointsDisplay.textContent = points;
-                
-                // إزالة التأثيرات
-                circle.classList.remove('goal-effect');
-                target.classList.remove('goal-effect');
-                target.classList.remove('coverage-good');
-                
-                // إعادة تعيين موقع الكرة
-                circleX = containerWidth / 2;
-                circleY = containerHeight / 2;
-                updateCirclePosition();
-                
-                // وضع هدف جديد
-                placeTarget();
-                
-                // تفعيل اللعبة من جديد
-                gameActive = true;
-            });
-            
-            // تهيئة اللعبة
-            function initGame() {
-                adjustCircleSize();
-                updateContainerSize();
-                circleX = containerWidth / 2;
-                circleY = containerHeight / 2;
-                updateCirclePosition();
-                placeTarget();
-                updateCoverageIndicator();
-            }
-            
-            // إعادة حساب الأبعاد عند تغيير حجم النافذة
-            window.addEventListener('resize', function() {
-                if (gameActive) {
-                    adjustCircleSize();
-                    updateContainerSize();
-                    updateCirclePosition();
-                }
-            });
+        // --- إعداد المسرّع (Renderer) مع تحسينات للأجهزة اللمسية ---
+        const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // تحسين الأداء
+        renderer.shadowMap.enabled = true; // تفعيل الظلال
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+        document.body.appendChild(renderer.domElement);
+        
+        // --- إضافة تحكم OrbitControls لتجربة تفاعلية أفضل (اختياري) ---
+        // لكننا سنعطل التحكم اليدوي لأننا نريد التحكم باللمس بطريقتنا
+        // const controls = new OrbitControls(camera, renderer.domElement);
+        // controls.enableDamping = true;
+        // controls.enableZoom = true;
+        // controls.enablePan = false;
+        // controls.maxPolarAngle = Math.PI / 2;
+        
+        // --- الإضاءة ---
+        
+        // ضوء محيطي ناعم
+        const ambientLight = new THREE.AmbientLight(0x404060);
+        scene.add(ambientLight);
+        
+        // ضوء رئيسي (مباشر) يخلق ظلالاً
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(2, 5, 3);
+        directionalLight.castShadow = true;
+        directionalLight.receiveShadow = true;
+        directionalLight.shadow.mapSize.width = 1024;
+        directionalLight.shadow.mapSize.height = 1024;
+        const d = 10;
+        directionalLight.shadow.camera.left = -d;
+        directionalLight.shadow.camera.right = d;
+        directionalLight.shadow.camera.top = d;
+        directionalLight.shadow.camera.bottom = -d;
+        directionalLight.shadow.camera.near = 1;
+        directionalLight.shadow.camera.far = 15;
+        scene.add(directionalLight);
+        
+        // أضواء ملونة للزينة
+        const light1 = new THREE.PointLight(0xff0040, 1, 10);
+        light1.position.set(2, 1, 2);
+        scene.add(light1);
+        
+        const light2 = new THREE.PointLight(0x00ff40, 1, 10);
+        light2.position.set(-2, 1, -2);
+        scene.add(light2);
+        
+        const light3 = new THREE.PointLight(0x0040ff, 1, 10);
+        light3.position.set(2, 1, -2);
+        scene.add(light3);
+        
+        // --- إنشاء الشكل الهندسي الرئيسي (مجسم متعدد الأشكال) ---
+        
+        // مجموعة لتجميع الأشكال
+        const mainGroup = new THREE.Group();
+        
+        // شكل مركزي: كرة متعددة الأوجه (Icosahedron)
+        const geometry1 = new THREE.IcosahedronGeometry(1, 0); // تفاصيل قليلة للحصول على شكل هندسي واضح
+        const material1 = new THREE.MeshStandardMaterial({ 
+            color: 0xff5500,
+            emissive: 0x331100,
+            roughness: 0.3,
+            metalness: 0.1,
+            wireframe: false
         });
+        const coreShape = new THREE.Mesh(geometry1, material1);
+        coreShape.castShadow = true;
+        coreShape.receiveShadow = true;
+        mainGroup.add(coreShape);
         
-        // تسجيل Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(function(registration) {
-                        console.log('ServiceWorker registered successfully');
-                    })
-                    .catch(function(error) {
-                        console.log('ServiceWorker registration failed: ', error);
-                    });
-            });
+        // إطار سلكي حول الكرة
+        const wireframeGeo = new THREE.IcosahedronGeometry(1.05, 0);
+        const wireframeMat = new THREE.MeshStandardMaterial({
+            color: 0xffaa00,
+            emissive: 0x442200,
+            wireframe: true,
+            transparent: true,
+            opacity: 0.7
+        });
+        const wireframeSphere = new THREE.Mesh(wireframeGeo, wireframeMat);
+        wireframeSphere.castShadow = true;
+        wireframeSphere.receiveShadow = false;
+        mainGroup.add(wireframeSphere);
+        
+        // حلقات تدور حول الشكل (Torus)
+        const ringMaterial = new THREE.MeshStandardMaterial({ color: 0x33aaff, emissive: 0x113366 });
+        const ring1 = new THREE.Mesh(new THREE.TorusGeometry(1.6, 0.05, 16, 100), ringMaterial);
+        ring1.rotation.x = Math.PI / 2;
+        ring1.rotation.z = 0.3;
+        ring1.castShadow = true;
+        ring1.receiveShadow = false;
+        mainGroup.add(ring1);
+        
+        const ring2 = new THREE.Mesh(new THREE.TorusGeometry(1.9, 0.05, 16, 100), ringMaterial);
+        ring2.rotation.y = 0.8;
+        ring2.rotation.x = 0.7;
+        ring2.material = new THREE.MeshStandardMaterial({ color: 0xff33aa, emissive: 0x331122 });
+        ring2.castShadow = true;
+        ring2.receiveShadow = false;
+        mainGroup.add(ring2);
+        
+        // مكعبات صغيرة تدور حول الشكل الرئيسي
+        const smallCubesGroup = new THREE.Group();
+        for (let i = 0; i < 8; i++) {
+            const cubeGeo = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+            const cubeMat = new THREE.MeshStandardMaterial({ color: Math.random() * 0xffffff });
+            const cube = new THREE.Mesh(cubeGeo, cubeMat);
+            const angle = (i / 8) * Math.PI * 2;
+            cube.position.set(Math.cos(angle) * 2.2, Math.sin(angle * 2) * 0.5, Math.sin(angle) * 2.2);
+            cube.castShadow = true;
+            cube.receiveShadow = false;
+            smallCubesGroup.add(cube);
+        }
+        mainGroup.add(smallCubesGroup);
+        
+        scene.add(mainGroup);
+        
+        // --- إنشاء أرضية عاكسة ---
+        const floorGeometry = new THREE.CircleGeometry(8, 32);
+        const floorMaterial = new THREE.MeshStandardMaterial({ 
+            color: 0x1a1a2e,
+            roughness: 0.4,
+            metalness: 0.1,
+            transparent: true,
+            opacity: 0.6,
+            side: THREE.DoubleSide
+        });
+        const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+        floor.rotation.x = -Math.PI / 2;
+        floor.position.y = -1.2;
+        floor.receiveShadow = true;
+        scene.add(floor);
+        
+        // شبكة أرضية للزينة
+        const gridHelper = new THREE.GridHelper(15, 20, 0x3366ff, 0x2244aa);
+        gridHelper.position.y = -1.1;
+        scene.add(gridHelper);
+        
+        // --- إضافة جزيئات صغيرة (Stars) حول المشهد ---
+        const starsGeometry = new THREE.BufferGeometry();
+        const starsCount = 600;
+        const starsPositions = new Float32Array(starsCount * 3);
+        for (let i = 0; i < starsCount * 3; i += 3) {
+            starsPositions[i] = (Math.random() - 0.5) * 30;
+            starsPositions[i+1] = (Math.random() - 0.5) * 20;
+            starsPositions[i+2] = (Math.random() - 0.5) * 30;
+        }
+        starsGeometry.setAttribute('position', new THREE.BufferAttribute(starsPositions, 3));
+        const starsMaterial = new THREE.PointsMaterial({ color: 0x88aaff, size: 0.05, transparent: true });
+        const stars = new THREE.Points(starsGeometry, starsMaterial);
+        scene.add(stars);
+        
+        // --- متغيرات التحكم باللمس والحركة ---
+        let targetRotationX = 0;
+        let targetRotationY = 0;
+        let currentRotationX = 0;
+        let currentRotationY = 0;
+        let isTouching = false;
+        let touchX = 0;
+        let touchY = 0;
+        let score = 0;
+        const scoreElement = document.getElementById('scoreValue');
+        
+        // --- متغيرات لتأثير الدوران التلقائي ---
+        let autoRotateSpeed = 0.005;
+        
+        // --- أحداث اللمس للهواتف والأجهزة اللوحية ---
+        renderer.domElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+        renderer.domElement.addEventListener('touchmove', handleTouchMove, { passive: false });
+        renderer.domElement.addEventListener('touchend', handleTouchEnd);
+        renderer.domElement.addEventListener('touchcancel', handleTouchEnd);
+        
+        // --- أحداث الماوس لأجهزة الكمبيوتر (اختياري) ---
+        renderer.domElement.addEventListener('mousedown', handleMouseDown);
+        renderer.domElement.addEventListener('mousemove', handleMouseMove);
+        renderer.domElement.addEventListener('mouseup', handleMouseUp);
+        renderer.domElement.addEventListener('mouseleave', handleMouseUp);
+        
+        // --- دوال معالجة اللمس ---
+        function handleTouchStart(event) {
+            event.preventDefault();
+            const touch = event.touches[0];
+            if (touch) {
+                isTouching = true;
+                touchX = (touch.clientX / window.innerWidth) * 2 - 1;
+                touchY = -(touch.clientY / window.innerHeight) * 2 + 1;
+                
+                // زيادة النقاط عند اللمس
+                score += 5;
+                scoreElement.textContent = score;
+                
+                // تأثير مؤقت عند اللمس
+                mainGroup.children.forEach(child => {
+                    if (child.material && !child.material.wireframe) {
+                        child.material.emissive.setHex(0x444400);
+                        setTimeout(() => {
+                            child.material.emissive.setHex(0x000000);
+                        }, 200);
+                    }
+                });
+            }
         }
         
-        // منع السلوك الافتراضي لللمس
-        document.addEventListener('touchmove', function(e) {
-            if (e.scale !== 1) {
-                e.preventDefault();
+        function handleTouchMove(event) {
+            event.preventDefault();
+            if (isTouching) {
+                const touch = event.touches[0];
+                if (touch) {
+                    touchX = (touch.clientX / window.innerWidth) * 2 - 1;
+                    touchY = -(touch.clientY / window.innerHeight) * 2 + 1;
+                    
+                    // تحديث زوايا الهدف بناءً على موقع اللمس
+                    targetRotationY = touchX * Math.PI; // دوران أفقي كامل
+                    targetRotationX = touchY * (Math.PI / 3); // دوران رأسي محدود
+                }
             }
-        }, { passive: false });
+        }
         
-        // منع التكبير بالدبل تاب
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', function(e) {
-            const now = (new Date()).getTime();
-            if (now - lastTouchEnd <= 300) {
-                e.preventDefault();
+        function handleTouchEnd(event) {
+            event.preventDefault();
+            isTouching = false;
+            // لا نعيد تعيين الهدف، بل نتركه يستمر في الدوران التلقائي ببطء
+        }
+        
+        // --- دوال الماوس (للكمبيوتر) ---
+        function handleMouseDown(event) {
+            isTouching = true;
+            touchX = (event.clientX / window.innerWidth) * 2 - 1;
+            touchY = -(event.clientY / window.innerHeight) * 2 + 1;
+            
+            score += 5;
+            scoreElement.textContent = score;
+        }
+        
+        function handleMouseMove(event) {
+            if (isTouching) {
+                touchX = (event.clientX / window.innerWidth) * 2 - 1;
+                touchY = -(event.clientY / window.innerHeight) * 2 + 1;
+                
+                targetRotationY = touchX * Math.PI;
+                targetRotationX = touchY * (Math.PI / 3);
             }
-            lastTouchEnd = now;
-        }, false);
+        }
+        
+        function handleMouseUp(event) {
+            isTouching = false;
+        }
+        
+        // --- تكييف حجم الشاشة ---
+        window.addEventListener('resize', onWindowResize, false);
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+        
+        // --- حلقة الرسوم المتحركة ---
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            // تحديث زوايا الدوران بسلاسة (interpolation)
+            if (isTouching) {
+                // إذا كان المستخدم يلمس، نتحرك بسرعة نحو الهدف
+                currentRotationY += (targetRotationY - currentRotationY) * 0.1;
+                currentRotationX += (targetRotationX - currentRotationX) * 0.1;
+            } else {
+                // إذا لم يكن هناك لمس، دوران تلقائي بطيء
+                currentRotationY += autoRotateSpeed;
+                // لا نغير currentRotationX في الوضع التلقائي
+            }
+            
+            // تطبيق الدوران على المجموعة الرئيسية
+            mainGroup.rotation.x = currentRotationX;
+            mainGroup.rotation.y = currentRotationY;
+            
+            // دوران إضافي للحلقات والمكعبات الصغيرة
+            if (mainGroup.children.length > 0) {
+                // دوران الحلقات بشكل منفصل
+                if (mainGroup.children[2]) mainGroup.children[2].rotation.z += 0.01;
+                if (mainGroup.children[3]) mainGroup.children[3].rotation.x += 0.015;
+                
+                // دوران المكعبات الصغيرة حول نفسها
+                const cubesGroup = mainGroup.children[4];
+                if (cubesGroup) {
+                    cubesGroup.children.forEach((cube, index) => {
+                        cube.rotation.x += 0.02;
+                        cube.rotation.y += 0.03;
+                    });
+                }
+            }
+            
+            // تحريك النجوم ببطء
+            stars.rotation.y += 0.0002;
+            
+            // تحريك الكاميرا قليلاً للحصول على تأثير حيوي
+            const time = Date.now() * 0.001;
+            camera.position.x = 5 * Math.sin(time * 0.1) + 2;
+            camera.position.z = 8 * Math.cos(time * 0.1) + 2;
+            camera.position.y = 3 + Math.sin(time * 0.2) * 0.5;
+            camera.lookAt(0, 0, 0);
+            
+            // controls.update(); // إذا أردت استخدام OrbitControls
+            
+            renderer.render(scene, camera);
+        }
+        
+        animate();
+        
+        // --- إضافة بعض التأثيرات الصوتية البسيطة (اختياري) غير مفعلة لتجنب مشاكل المتصفح ---
+        // يمكن تفعيلها إذا أردت
+        
+        console.log('لعبة الشكل الهندسي ثلاثي الأبعاد جاهزة! المس الشاشة لتبدأ.');
     </script>
 </body>
 </html>
