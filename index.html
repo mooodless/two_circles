@@ -238,6 +238,10 @@
             touch-action: none;
             transform-style: preserve-3d;
             z-index: 10;
+            /* إضافة خلفية للكرة */
+            background: radial-gradient(circle at 30% 30%, #ff4d4d, #cc0000);
+            border-radius: 50%;
+            box-shadow: 0 0 30px rgba(255, 0, 0, 0.8);
         }
         
         /* الهيكل الداخلي للكرة ثلاثية الأبعاد */
@@ -257,11 +261,11 @@
             border-radius: 50%;
             background: radial-gradient(circle at 30% 30%, #ff4d4d, #cc0000);
             box-shadow: 
-                0 0 30px rgba(255, 0, 0, 0.8),
                 inset -5px -10px 20px rgba(0,0,0,0.5),
                 inset 5px 5px 20px rgba(255,255,255,0.6);
             border: 2px solid rgba(255, 255, 255, 0.3);
             backface-visibility: visible;
+            opacity: 0.9; /* شفافية خفيفة لإظهار الطبقات */
         }
         
         /* توزيع الأوجه لتشكيل كرة حقيقية */
@@ -442,10 +446,6 @@
         }
         
         /* دوران الكرة أثناء الحركة */
-        .sphere-moving {
-            animation: spin 0.5s linear infinite;
-        }
-        
         @keyframes spin {
             from { transform: rotateX(0deg) rotateY(0deg); }
             to { transform: rotateX(360deg) rotateY(360deg); }
