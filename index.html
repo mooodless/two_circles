@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>لعبة الكرة المتحركة</title>
+    <title>لعبة الدائرة المتحركة</title>
     
     <!-- إضافة وصف وأيقونة للتطبيق -->
-    <meta name="description" content="لعبة الكرة المتحركة - تحدي الدقة والسرعة">
+    <meta name="description" content="لعبة الدائرة المتحركة - تحدي الدقة والسرعة">
     <link rel="icon" type="image/png" href="images/bals.png">
     
     <!-- إضافة خاصية PWA للتطبيق -->
@@ -18,7 +18,7 @@
     <!-- Meta tags for iOS -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="لعبة الكرة المتحركة">
+    <meta name="apple-mobile-web-app-title" content="لعبة الدائرة المتحركة">
     <style>
         /* أضف هذا النمط لمنع التأثيرات غير المرغوب فيها */
         html, body {
@@ -231,20 +231,13 @@
             position: absolute;
             width: 60px;
             height: 60px;
-            background-color: transparent;
+            background-color: red;
             border-radius: 50%;
             cursor: pointer;
             transition: transform 0.1s;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.7);
             z-index: 10;
             touch-action: none;
-            /* إزالة الظل الأحمر */
-            box-shadow: none;
-            /* إضافة صورة كرة القدم */
-            background-image: url('images/foot_ball.png');
-            background-size: cover;
-            background-position: center;
-            /* إضافة دوران للكرة */
-            transform-style: preserve-3d;
         }
         
         @media (max-width: 480px) {
@@ -466,53 +459,24 @@
             margin: 10px 0;
             border: 1px solid #ff6b6b;
         }
-        
-        /* تأثير دوران الكرة */
-        .ball-rotation {
-            animation: ballRotation 0.5s linear infinite;
-        }
-        
-        @keyframes ballRotation {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* تأثير دوران الكرة حسب الاتجاه */
-        .ball-rotation-x {
-            animation: ballRotationX 0.5s linear infinite;
-        }
-        
-        @keyframes ballRotationX {
-            0% { transform: rotateX(0deg); }
-            100% { transform: rotateX(360deg); }
-        }
-        
-        .ball-rotation-y {
-            animation: ballRotationY 0.5s linear infinite;
-        }
-        
-        @keyframes ballRotationY {
-            0% { transform: rotateY(0deg); }
-            100% { transform: rotateY(360deg); }
-        }
     </style>
 </head>
 <body>
     <!-- شاشة البداية -->
     <div id="start-screen">
         <div class="app-header">
-            <h1>لعبة الكرة المتحركة</h1>
+            <h1>لعبة الدائرة المتحركة</h1>
         </div>
         
         <button id="start-button" class="start-button">بدء اللعبة</button>
         <div id="instructions-container">
             <h2>طريقة اللعب</h2>
             <ul>
-                <li>⚽ المس كرة القدم لتحريكها في نفس اتجاه المس</li>
-                <li>🎯 حاول تغطية 1% من الدائرة الزرقاء عند توقف الكرة</li>
-                <li>⏱️ تتحرك الكرة بسرعة في البداية ثم تتباطأ تدريجياً</li>
+                <li>🔴 المس الدائرة الحمراء لتحريكها في نفس اتجاه المس</li>
+                <li>🎯 حاول تغطية 1% من الدائرة الزرقاء عند توقف الدائرة الحمراء</li>
+                <li>⏱️ تتحرك الدائرة بسرعة في البداية ثم تتباطأ تدريجياً</li>
                 <li>🎆 عند تحقيق الهدف، ستظهر ألعاب نارية كاملة الشاشة لمدة 3 ثوانٍ</li>
-                <li>🔄 يمكنك إيقاف الكرة المتحركة بلمسها مرة أخرى</li>
+                <li>🔄 يمكنك إيقاف الدائرة المتحركة بلمسها مرة أخرى</li>
             </ul>
         </div>
     </div>
@@ -593,14 +557,13 @@
             let moveDuration = 0;
             let gameActive = false;
             let currentCoverage = 0;
-            let ballRotation = 0;
             
-            // أبعاد الكرة والحاوية
+            // أبعاد الدائرة والحاوية
             let circleRadius = 30;
             let targetRadius = 30;
             let containerWidth, containerHeight;
             
-            // موضع الكرة الحالي
+            // موضع الدائرة الحالي
             let circleX, circleY;
             
             // ضبط نصف القطر بناءً على حجم الشاشة
@@ -808,7 +771,7 @@
             function goalAchieved() {
                 gameActive = false;
                 
-                // إضافة تأثير للكرة والهدف
+                // إضافة تأثير للدائرة والهدف
                 circle.classList.add('goal-effect');
                 target.classList.add('goal-effect');
                 
@@ -822,9 +785,9 @@
                 }, 3000);
             }
             
-            // تحديث موضع الكرة
+            // تحديث موضع الدائرة
             function updateCirclePosition() {
-                // التأكد من أن الكرة لا تخرج عن حدود الإطار
+                // التأكد من أن الدائرة لا تخرج عن حدود الإطار
                 circleX = Math.max(circleRadius, Math.min(circleX, containerWidth - circleRadius));
                 circleY = Math.max(circleRadius, Math.min(circleY, containerHeight - circleRadius));
                 
@@ -847,30 +810,7 @@
                 }
             }
             
-            // تحديث دوران الكرة حسب اتجاه الحركة
-            function updateBallRotation() {
-                if (isMoving && velocity > 0.5) {
-                    // حساب زاوية الدوران بناءً على اتجاه الحركة
-                    const rotationSpeed = velocity * 10; // زيادة سرعة الدوران مع زيادة سرعة الحركة
-                    
-                    // إزالة فئات الدوران السابقة
-                    circle.classList.remove('ball-rotation', 'ball-rotation-x', 'ball-rotation-y');
-                    
-                    // تحديد اتجاه الدوران بناءً على اتجاه الحركة
-                    if (Math.abs(directionX) > Math.abs(directionY)) {
-                        // الحركة أفقية أكثر - تدوير حول المحور Y
-                        circle.classList.add('ball-rotation-y');
-                    } else {
-                        // الحركة عمودية أكثر - تدوير حول المحور X
-                        circle.classList.add('ball-rotation-x');
-                    }
-                } else {
-                    // إيقاف الدوران عند التوقف
-                    circle.classList.remove('ball-rotation', 'ball-rotation-x', 'ball-rotation-y');
-                }
-            }
-            
-            // بدء الحركة عند لمس الكرة
+            // بدء الحركة عند لمس الدائرة
             circle.addEventListener('touchstart', handleTouchStart);
             circle.addEventListener('mousedown', handleMouseDown);
             
@@ -900,11 +840,11 @@
                     const touchPosX = clientX - containerRect.left;
                     const touchPosY = clientY - containerRect.top;
                     
-                    // حساب مركز الكرة
+                    // حساب مركز الدائرة
                     const circleCenterX = circleX;
                     const circleCenterY = circleY;
                     
-                    // حساب المتجه من مركز الكرة إلى نقطة اللمس
+                    // حساب المتجه من مركز الدائرة إلى نقطة اللمس
                     const vectorX = touchPosX - circleCenterX;
                     const vectorY = touchPosY - circleCenterY;
                     
@@ -930,7 +870,7 @@
                         moveCircle();
                     }
                 } else {
-                    // إذا كانت الكرة تتحرك، إيقافها
+                    // إذا كانت الدائرة تتحرك، إيقافها
                     isMoving = false;
                     velocity = 0;
                     timerProgress.style.width = '0%';
@@ -938,12 +878,10 @@
                         cancelAnimationFrame(animationId);
                         animationId = null;
                     }
-                    // إيقاف دوران الكرة
-                    circle.classList.remove('ball-rotation', 'ball-rotation-x', 'ball-rotation-y');
                 }
             }
             
-            // دالة تحريك الكرة
+            // دالة تحريك الدائرة
             function moveCircle() {
                 if (!isMoving || !gameActive) return;
                 
@@ -971,11 +909,8 @@
                     directionY *= -1;
                 }
                 
-                // تحديث موضع الكرة
+                // تحديث موضع الدائرة
                 updateCirclePosition();
-                
-                // تحديث دوران الكرة
-                updateBallRotation();
                 
                 // تقليل السرعة تدريجيًا
                 velocity *= friction;
@@ -986,9 +921,6 @@
                     isMoving = false;
                     timerProgress.style.width = '0%';
                     animationId = null;
-                    
-                    // إيقاف دوران الكرة
-                    circle.classList.remove('ball-rotation', 'ball-rotation-x', 'ball-rotation-y');
                     
                     // التحقق من تحقيق الهدف بعد التوقف
                     setTimeout(checkGoal, 100);
@@ -1010,7 +942,7 @@
                 target.classList.remove('goal-effect');
                 target.classList.remove('coverage-good');
                 
-                // إعادة تعيين موقع الكرة
+                // إعادة تعيين موقع الدائرة
                 circleX = containerWidth / 2;
                 circleY = containerHeight / 2;
                 updateCirclePosition();
