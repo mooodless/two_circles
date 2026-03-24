@@ -11,74 +11,17 @@
             font-family: 'Arial', sans-serif;
         }
         
-        #info {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: white;
-            background: rgba(0,0,0,0.7);
-            padding: 10px 20px;
-            border-radius: 30px;
-            pointer-events: none;
-            z-index: 10;
-            font-size: 16px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        
-        #score {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            color: white;
-            background: rgba(0,0,0,0.7);
-            padding: 10px 20px;
-            border-radius: 30px;
-            pointer-events: none;
-            z-index: 10;
-            font-size: 16px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2);
-        }
-        
-        #instructions {
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            color: white;
-            background: rgba(0,0,0,0.5);
-            padding: 12px 24px;
-            border-radius: 50px;
-            font-size: 18px;
-            text-align: center;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(255,255,255,0.2);
-            white-space: nowrap;
-            z-index: 10;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 0.7; transform: translateX(-50%) scale(1); }
-            50% { opacity: 1; transform: translateX(-50%) scale(1.05); }
-            100% { opacity: 0.7; transform: translateX(-50%) scale(1); }
-        }
-        
         @media (max-width: 600px) {
-            #instructions {
+            #score {
                 font-size: 14px;
-                padding: 10px 16px;
-                white-space: normal;
-                width: 80%;
+                top: 15px;
+                right: 15px;
+                padding: 8px 16px;
             }
         }
     </style>
 </head>
 <body>
-    <div id="info">🔮 الشكل الهندسي ثلاثي الأبعاد</div>
-    <div id="score">النقاط: <span id="scoreValue">0</span></div>
-    <div id="instructions">👆 المس الشاشة لتحريك الشكل حول المركز</div>
 
     <!-- استيراد مكتبة Three.js -->
     <script type="importmap">
@@ -91,13 +34,12 @@
 
     <script type="module">
         import * as THREE from 'three';
-        import { OrbitControls } from 'https://unpkg.com/three@0.128.0/examples/jsm/controls/OrbitControls.js';
 
         // --- إعداد المشهد ---
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x0a0a20); // لون خلفية داكن
         
-        // --- إعداد الكاميرا (منظور متحرك) ---
+        // --- إعداد الكاميرا (منظور ثابت بدون تكبير/تصغير) ---
         const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(5, 3, 8);
         camera.lookAt(0, 0, 0);
@@ -110,13 +52,25 @@
         renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         document.body.appendChild(renderer.domElement);
         
-        // --- إضافة تحكم OrbitControls لتجربة تفاعلية أفضل (اختياري) ---
-        // لكننا سنعطل التحكم اليدوي لأننا نريد التحكم باللمس بطريقتنا
-        // const controls = new OrbitControls(camera, renderer.domElement);
-        // controls.enableDamping = true;
-        // controls.enableZoom = true;
-        // controls.enablePan = false;
-        // controls.maxPolarAngle = Math.PI / 2;
+        // منع سلوك التكبير/التصغير باللمس عبر CSS و HTML meta
+        // تم إضافة user-scalable=no في meta، ونمنع أيضًا أحداث اللمس المزدوجة التي تسبب التكبير
+        renderer.domElement.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                e.preventDefault(); // منع حركة القرص للتكبير
+            }
+        }, { passive: false });
+        
+        // منع حدث wheel (عجلة الماوس) لمنع التكبير/التصغير
+        window.addEventListener('wheel', (e) => {
+            e.preventDefault();
+        }, { passive: false });
+        
+        // منع حدث keydown للتحكم في التكبير (مثل Ctrl +)
+        window.addEventListener('keydown', (e) => {
+            if (e.ctrlKey && (e.key === '+' || e.key === '-' || e.key === '=' || e.key === '_')) {
+                e.preventDefault();
+            }
+        });
         
         // --- الإضاءة ---
         
@@ -262,8 +216,6 @@
         let isTouching = false;
         let touchX = 0;
         let touchY = 0;
-        let score = 0;
-        const scoreElement = document.getElementById('scoreValue');
         
         // --- متغيرات لتأثير الدوران التلقائي ---
         let autoRotateSpeed = 0.005;
@@ -283,22 +235,22 @@
         // --- دوال معالجة اللمس ---
         function handleTouchStart(event) {
             event.preventDefault();
+            // منع تكبير اللمس المزدوج
+            if (event.touches.length === 2) return;
+            
             const touch = event.touches[0];
             if (touch) {
                 isTouching = true;
                 touchX = (touch.clientX / window.innerWidth) * 2 - 1;
                 touchY = -(touch.clientY / window.innerHeight) * 2 + 1;
                 
-                // زيادة النقاط عند اللمس
-                score += 5;
-                scoreElement.textContent = score;
                 
                 // تأثير مؤقت عند اللمس
                 mainGroup.children.forEach(child => {
                     if (child.material && !child.material.wireframe) {
                         child.material.emissive.setHex(0x444400);
                         setTimeout(() => {
-                            child.material.emissive.setHex(0x000000);
+                            if (child.material) child.material.emissive.setHex(0x000000);
                         }, 200);
                     }
                 });
@@ -307,7 +259,7 @@
         
         function handleTouchMove(event) {
             event.preventDefault();
-            if (isTouching) {
+            if (isTouching && event.touches.length === 1) {
                 const touch = event.touches[0];
                 if (touch) {
                     touchX = (touch.clientX / window.innerWidth) * 2 - 1;
@@ -332,8 +284,15 @@
             touchX = (event.clientX / window.innerWidth) * 2 - 1;
             touchY = -(event.clientY / window.innerHeight) * 2 + 1;
             
-            score += 5;
-            scoreElement.textContent = score;
+            // تأثير مؤقت عند النقر
+            mainGroup.children.forEach(child => {
+                if (child.material && !child.material.wireframe) {
+                    child.material.emissive.setHex(0x444400);
+                    setTimeout(() => {
+                        if (child.material) child.material.emissive.setHex(0x000000);
+                    }, 200);
+                }
+            });
         }
         
         function handleMouseMove(event) {
@@ -370,7 +329,9 @@
             } else {
                 // إذا لم يكن هناك لمس، دوران تلقائي بطيء
                 currentRotationY += autoRotateSpeed;
-                // لا نغير currentRotationX في الوضع التلقائي
+                // لا نغير currentRotationX في الوضع التلقائي، مع ميل بسيط للعودة إلى الصفر
+                currentRotationX *= 0.98;
+                targetRotationX = 0; // إعادة توجيه الهدف تدريجياً للاستقامة
             }
             
             // تطبيق الدوران على المجموعة الرئيسية
@@ -396,24 +357,32 @@
             // تحريك النجوم ببطء
             stars.rotation.y += 0.0002;
             
-            // تحريك الكاميرا قليلاً للحصول على تأثير حيوي
+            // تحريك الكاميرا قليلاً للحصول على تأثير حيوي ولكن بدون تغيير مستوى التكبير/التصغير (نحافظ على مسافة ثابتة نسبياً)
             const time = Date.now() * 0.001;
-            camera.position.x = 5 * Math.sin(time * 0.1) + 2;
-            camera.position.z = 8 * Math.cos(time * 0.1) + 2;
-            camera.position.y = 3 + Math.sin(time * 0.2) * 0.5;
+            // نحافظ على مسافة الكاميرا من المركز بين 7.5 و 8.5 لتجنب تغيير الحجم الكبير
+            const radiusX = 5.5;
+            const radiusZ = 7.5;
+            camera.position.x = Math.sin(time * 0.1) * 1.2 + 4.5;
+            camera.position.z = Math.cos(time * 0.1) * 1.2 + 7.2;
+            camera.position.y = 3 + Math.sin(time * 0.2) * 0.4;
             camera.lookAt(0, 0, 0);
-            
-            // controls.update(); // إذا أردت استخدام OrbitControls
             
             renderer.render(scene, camera);
         }
         
         animate();
         
-        // --- إضافة بعض التأثيرات الصوتية البسيطة (اختياري) غير مفعلة لتجنب مشاكل المتصفح ---
-        // يمكن تفعيلها إذا أردت
+        document.addEventListener('gesturestart', function(e) {
+            e.preventDefault();
+        });
         
-        console.log('لعبة الشكل الهندسي ثلاثي الأبعاد جاهزة! المس الشاشة لتبدأ.');
+        window.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && (e.key === '+' || e.key === '-' || e.key === '0' || e.key === '=')) {
+                e.preventDefault();
+            }
+        });
+        
+        console.log('لعبة الشكل الهندسي ثلاثي الأبعاد جاهزة! المس الشاشة لتحريك الشكل. تم تعطيل التكبير/التصغير.');
     </script>
 </body>
 </html>
